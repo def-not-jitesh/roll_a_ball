@@ -33,11 +33,21 @@ public class PlayerController : MonoBehaviour {
 
 	void setCountText() {
 		countText.text = "Count: " + count.ToString(); 
+
+		if (count >= 6) {
+			winTextObject.SetActive(true); 
+			Destroy(GameObject.FindGameObjectWithTag("Enemy")); 
+		}
 	}
 
 	void FixedUpdate() {
-		Vector3 movement = new Vector3 (movementX, 0.0f, movementY); 
-		rb.AddForce(movement * speed); 
+
+		if ((-10 <= rb.position.x) && (rb.position.x <= 10) && (-10 <= rb.position.z) && (rb.position.z <= 10)) {
+			Vector3 movement = new Vector3 (movementX, 0.0f, movementY); 
+			rb.AddForce(movement * speed);
+		} else {
+			rb.MovePosition(new Vector3(0, 0.5f, 0)); 
+		}
 	}
 
 	void OnTriggerEnter(Collider other) {
@@ -46,9 +56,14 @@ public class PlayerController : MonoBehaviour {
 			count = count + 1; 
 			setCountText(); 
 
-			if (count >= 6) {
-				winTextObject.SetActive(true); 
-			}
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision) {
+		if (collision.gameObject.CompareTag("Enemy")) {
+			Destroy(gameObject); 
+			winTextObject.gameObject.SetActive(true); 
+			winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose"; 
 		}
 	}
 
